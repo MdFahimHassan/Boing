@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     hud.classList.remove("hidden");
 
     // Load level + start game loop
-    fetch("src/levels/level1.json")
+    fetch("src/levels/level01.json")
       .then(res => res.json())
       .then(levelData => {
         Game.level = levelData;   // store level data
