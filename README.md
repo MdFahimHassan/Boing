@@ -1,4 +1,4 @@
-# Boing! 🎮
+# Boing! 🏀
 
 Boing! is a nostalgic web revival inspired by classic bouncing ball adventures. Built from scratch as a web app, it combines retro charm with modern polish. Simple controls, addictive physics, and vibrant design make every bounce a blast.
 
