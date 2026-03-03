@@ -105,7 +105,6 @@ button:hover {
   left: 50%;
   transform: translate(-50%, -50%);
 }
-<<<<<<< HEAD
 
 /* Pause menu */
 #pause-menu {
@@ -146,5 +145,3 @@ button:hover {
   z-index: -1;         /* pushes it behind your UI */
   pointer-events: none; /* prevents clicks from hitting the video */
 }
-=======
->>>>>>> 690800a44c7a1cc762ef79ab124e0d0983cbca17
