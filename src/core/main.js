@@ -159,16 +159,40 @@ const Game = {
     if (axis === "y") {
       if (player.velY > 0) { // falling - find highest solid tile
         let maxY = -1;
+        let maxTile = 0;
         for (let y = playerTop; y < playerBot; y++) {
           for (let x = playerLef; x < playerRig; x++) {
             if (x < 0 || x >= width || y < 0 || y >= height) continue;
             const tile = tiles[y][x];
             if (tile === 1 || tile === 2) {
-              if (y > maxY) maxY = y; // find the LOWEST (highest Y) solid tile
+              if (y > maxY) {
+                maxY = y; // find the LOWEST (highest Y) solid tile
+                maxTile = tile;
+              }
             }
           }
         }
         if (maxY !== -1) {
+          // If the tile we're landing on is an obstacle, trigger death
+          if (maxTile === 2 && !player.hitObstacle) {
+            const { spawn, tileSize: ts } = this.level;
+            player.x = spawn.x * ts;
+            player.y = spawn.y * ts;
+            player.velX = 0;
+            player.velY = 0;
+            player.onground = false;
+            player.fallStartY = null;
+            Game.lives--;
+            Game.score = 0;
+            Game.level.tiles = JSON.parse(JSON.stringify(Game.originalTiles));
+            updateHUD(Game.score, Game.lives, 1);
+            player.hitObstacle = true;
+            if (Game.lives <= 0) {
+              Game.gameOver = true;
+            }
+            return;
+          }
+
           player.y = maxY * tileSize - player.height; // snap to top of the lowest solid tile
           if (player.fallStartY !== null) {
             const heightFallen = player.fallStartY - player.y;
@@ -229,6 +253,57 @@ const Game = {
             }
 
             return; // skip further collision processing this frame after hitting an obstacle
+          }
+
+          // 🔴 Obstacle check (works from any direction)
+          if (tile === 2 && !player.hitObstacle) {
+
+            const { spawn, tileSize: ts } = this.level;
+
+            player.x = spawn.x * ts;
+            player.y = spawn.y * ts;
+            player.velX = 0;
+            player.velY = 0;
+            player.onground = false;
+            player.fallStartY = null;
+
+            Game.lives--;
+            Game.score = 0;
+            Game.level.tiles = JSON.parse(JSON.stringify(Game.originalTiles));
+            updateHUD(Game.score, Game.lives, 1);
+
+            player.hitObstacle = true;
+
+            if (Game.lives <= 0) {
+              Game.gameOver = true;
+          }
+
+          return; // IMPORTANT: stop further collision processing
+        }
+
+          if (tile === 1) {
+            if (axis === "x") {
+              if (player.velX > 0) { // moving right
+                player.x = x * tileSize - player.width;
+              }
+              else if (player.velX < 0) { // moving left
+                player.x = (x + 1) * tileSize;
+              }
+              player.velX = 0;
+            }
+
+            if (axis === "y") {
+              if (player.velY > 0) { // falling
+                player.y = y * tileSize - player.height;
+                player.velY = 0;
+                player.onground = true;
+                player.fallStartY = null; // reset fall start on landing
+              }
+              else if (player.velY < 0) { // jumping
+                player.y = (y + 1) * tileSize;
+                player.velY = 0;
+              }
+            }
           }
 
           if (axis === "x") {
