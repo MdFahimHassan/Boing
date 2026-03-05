@@ -30,7 +30,6 @@ document.addEventListener("keydown", (e) => {
     player.velY = 0;
     player.onground = false;
     player.hitObstacle = false;
-    player.collected = false;
     Game.score = 0; // reset score
     Game.level.tiles = JSON.parse(JSON.stringify(Game.originalTiles)); // restore collectibles
     updateHUD(Game.score, Game.lives, 1);
@@ -52,8 +51,7 @@ const player = { // player properties
   gravity: 800,
   onground: false,
   lives: 3,
-  hitObstacle: false,
-  collected: false
+  hitObstacle: false
 };
 
 const DEFAULT_LEVEL = {
@@ -81,6 +79,8 @@ const Game = {
   lives: 3,
   originalTiles: null, // store original tile map
   paused: false, // pause state
+  levelCompleted: false, // level completion state
+  gameOver: false, // game over state
 
   async loadLevel(path) {
     // attempt fetch, fall back to default if network fails (e.g. file://)
@@ -109,12 +109,13 @@ const Game = {
     player.velY = 0;
     player.onground = false;
     player.hitObstacle = false;
-    player.collected = false;
 
     // Initialize game state
     this.score = 0;
     this.lives = 3;
     this.paused = false;
+    this.levelCompleted = false;
+    this.gameOver = false;
 
     // Update HUD
     updateHUD(this.score, this.lives, 1);
@@ -130,9 +131,11 @@ const Game = {
     this.deltaTime = Math.min((timestamp - this.lastTime) / 1000, 1/30); // cap deltaTime to prevent large jumps
     this.lastTime = timestamp;
 
-    if (!this.paused) {
+    if (!this.paused && !this.levelCompleted && !this.gameOver) {
       this.update(this.deltaTime);
       this.render();
+    } else {
+      this.render(); // still render to show completion or game over message
     }
 
     requestAnimationFrame(this.loop.bind(this));
@@ -189,14 +192,15 @@ const Game = {
           Game.level.tiles = JSON.parse(JSON.stringify(Game.originalTiles)); // restore collectibles
           updateHUD(Game.score, Game.lives, 1);
           player.hitObstacle = true;
+          if (Game.lives <= 0) {
+            Game.gameOver = true;
+          }
         }
 
-        // Handle collectible collision (tile 4)
-        if (tile === 4 && !player.collected) {
-          Game.score += 100;
-          tiles[y][x] = 0; // remove collectible
-          updateHUD(Game.score, Game.lives, 1);
-          player.collected = true;
+        // Handle collectible collision (tile 4) - now acts as goal
+        if (tile === 4 && !Game.levelCompleted) {
+          Game.levelCompleted = true;
+          tiles[y][x] = 0; // remove goal
         }
       }
     }
@@ -205,7 +209,6 @@ const Game = {
   update(dt) {
 
     player.hitObstacle = false; // reset flag each frame
-    player.collected = false; // reset flag each frame
 
     player.velX = 0; // reset horizontal velocity each frame
 
@@ -222,10 +225,41 @@ const Game = {
     this.handleCcollision("x"); // handle collisions after horizontal movement
     player.y += player.velY * dt;
     this.handleCcollision("y"); // handle collisions after vertical movement
+
+    // Check if player fell off the level
+    if (player.y > this.level.height * this.level.tileSize) {
+      const { spawn, tileSize } = this.level;
+      player.x = spawn.x * tileSize;
+      player.y = spawn.y * tileSize;
+      player.velX = 0;
+      player.velY = 0;
+      player.onground = false;
+      Game.lives--;
+      Game.score = 0; // reset score on fall
+      Game.level.tiles = JSON.parse(JSON.stringify(Game.originalTiles)); // restore collectibles
+      updateHUD(Game.score, Game.lives, 1);
+      if (Game.lives <= 0) {
+        Game.gameOver = true;
+      }
+    }
   },
 
   render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (this.levelCompleted) {
+      ctx.fillStyle = "white";
+      ctx.font = "30px monospace";
+      ctx.fillText("Level Complete!", canvas.width / 2 - 100, canvas.height / 2);
+      return;
+    }
+
+    if (this.gameOver) {
+      ctx.fillStyle = "white";
+      ctx.font = "30px monospace";
+      ctx.fillText("Game Over!", canvas.width / 2 - 80, canvas.height / 2);
+      return;
+    }
 
     if (this.level) {
       const { tiles, tileSize, width, height } = this.level;
