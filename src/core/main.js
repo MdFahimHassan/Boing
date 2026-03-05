@@ -227,6 +227,8 @@ const Game = {
             if (Game.lives <= 0) {
               Game.gameOver = true;
             }
+
+            return; // skip further collision processing this frame after hitting an obstacle
           }
 
           if (axis === "x") {
