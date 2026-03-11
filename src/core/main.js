@@ -167,7 +167,7 @@ const Game = {
           for (let x = playerLef; x < playerRig; x++) {
             if (x < 0 || x >= width || y < 0 || y >= height) continue;
             const tile = tiles[y][x];
-            if (tile === 1 || tile === 2) {
+            if (tile === 1 || tile === 2 || tile === 3) {
               if (y > maxY) {
                 maxY = y; // find the LOWEST (highest Y) solid tile
                 maxTile = tile;
@@ -194,6 +194,15 @@ const Game = {
               Game.gameOver = true;
             }
             Game.spawnProtection = 1; // freeze player for 1 second after respawn
+            return;
+          }
+
+          // If the tile we're landing on is a bouncepad, launch upward strongly
+          if (maxTile === 3) {
+            player.y = maxY * tileSize - player.height; // snap to top of bouncepad
+            player.velY = -350; // strong upward bounce
+            player.onground = false;
+            player.fallStartY = null;
             return;
           }
 
@@ -408,6 +417,20 @@ const Game = {
           if (tile === 2) {
             ctx.fillStyle = "blue"; // obstacle
             ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+          }
+          if (tile === 3) {
+            ctx.fillStyle = "lime"; // bouncepad
+            ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+            // Draw arrow to hint at bounce
+            ctx.fillStyle = "darkgreen";
+            const cx = x * tileSize + tileSize / 2;
+            const cy = y * tileSize + tileSize / 2;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - 8);
+            ctx.lineTo(cx - 6, cy + 6);
+            ctx.lineTo(cx + 6, cy + 6);
+            ctx.closePath();
+            ctx.fill();
           }
           if (tile === 4) {
             ctx.fillStyle = "yellow"; // collectible
