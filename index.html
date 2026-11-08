@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#1b1038">
+  <title>Boing!</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%238a4dea' stroke='%232a0f66' stroke-width='2'/%3E%3Ccircle cx='11' cy='13' r='3' fill='%23fff'/%3E%3Ccircle cx='21' cy='13' r='3' fill='%23fff'/%3E%3Ccircle cx='11.5' cy='13.5' r='1.4' fill='%231d0a4a'/%3E%3Ccircle cx='21.5' cy='13.5' r='1.4' fill='%231d0a4a'/%3E%3Cpath d='M10 20q6 5 12 0' stroke='%231d0a4a' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <canvas id="menu-bg"></canvas>
+  <canvas id="game" style="visibility:hidden"></canvas>
+
+  <!-- HUD -->
+  <div id="hud" class="hidden">
+    <div class="hud-box">
+      <span id="hud-hearts" class="hearts"></span>
+      <span class="hud-item"><i class="ring-icon"></i><b id="hud-rings">0/0</b></span>
+      <span class="hud-item"><i class="clock-icon">⏱</i><b id="hud-time">0:00.0</b></span>
+    </div>
+    <div class="hud-title" id="hud-title"></div>
+    <button id="pause-btn" class="icon-btn" aria-label="Pause">❚❚</button>
+  </div>
+
+  <!-- Touch controls -->
+  <div id="touch" class="hidden">
+    <div class="touch-left">
+      <button id="t-left" aria-label="Left">◀</button>
+      <button id="t-right" aria-label="Right">▶</button>
+    </div>
+    <button id="t-jump" aria-label="Jump">▲</button>
+  </div>
+
+  <button id="music-btn" class="icon-btn" aria-label="Toggle music">🎵</button>
+
+  <!-- Start -->
+  <section id="start-screen" class="panel screen">
+    <h1 class="logo">Boing!</h1>
+    <p class="tagline">Bounce. Collect. Don't pop.</p>
+    <button id="start-btn" class="btn primary">Start Game</button>
+    <button id="settings-btn" class="btn">Settings</button>
+    <p class="hint">← → move &nbsp;·&nbsp; ↑ / Space jump &nbsp;·&nbsp; Esc pause</p>
+  </section>
+
+  <!-- Difficulty -->
+  <section id="difficulty-screen" class="panel screen hidden">
+    <h2>Select Difficulty</h2>
+    <button class="btn diff" data-diff="easy"><b>Easy</b><small>5 lives</small></button>
+    <button class="btn diff" data-diff="normal"><b>Normal</b><small>3 lives</small></button>
+    <button class="btn diff" data-diff="hard"><b>Hard</b><small>2 lives</small></button>
+    <button class="btn ghost" data-back="start">← Back</button>
+  </section>
+
+  <!-- Level select -->
+  <section id="levels-screen" class="panel wide screen hidden">
+    <h2>Choose a Level</h2>
+    <div id="level-grid"></div>
+    <div class="row">
+      <button class="btn ghost" data-back="difficulty">← Back</button>
+      <span id="total-stars" class="total-stars"></span>
+    </div>
+  </section>
+
+  <!-- Pause -->
+  <section id="pause-screen" class="panel screen hidden">
+    <h2>Paused</h2>
+    <button id="resume-btn" class="btn primary">Resume</button>
+    <button id="retry-btn" class="btn">Restart Level</button>
+    <button id="quit-btn" class="btn">Level Select</button>
+  </section>
+
+  <!-- Level complete -->
+  <section id="win-screen" class="panel screen hidden">
+    <h2>Level Complete!</h2>
+    <div class="stars" id="win-stars"><span>★</span><span>★</span><span>★</span></div>
+    <ul class="stats" id="win-stats"></ul>
+    <p id="win-best" class="best"></p>
+    <button id="next-btn" class="btn primary">Next Level</button>
+    <button id="replay-btn" class="btn">Replay</button>
+    <button id="win-menu-btn" class="btn ghost">Level Select</button>
+  </section>
+
+  <!-- Game over -->
+  <section id="over-screen" class="panel screen hidden">
+    <h2>Out of Lives</h2>
+    <p>The blob has popped for the last time…</p>
+    <button id="over-retry-btn" class="btn primary">Try Again</button>
+    <button id="over-menu-btn" class="btn">Level Select</button>
+  </section>
+
+  <!-- Settings -->
+  <section id="settings-screen" class="panel screen hidden">
+    <h2>Settings</h2>
+    <button id="set-music" class="btn"></button>
+    <button id="set-sfx" class="btn"></button>
+    <button id="set-reset" class="btn danger">Reset Progress</button>
+    <button class="btn ghost" data-back="start">← Back</button>
+  </section>
+
+  <div id="toast" class="hidden"></div>
+  <canvas id="transition"></canvas>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

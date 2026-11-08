@@ -1,0 +1,11 @@
+{
+  "name": "boing",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "levels": "node tools/build-levels.mjs",
+    "verify": "node tools/verify.mjs"
+  }
+}
